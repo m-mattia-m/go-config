@@ -14,3 +14,6 @@ Further one must adapt the model if the Config.yaml file is adapted. Furthermore
 
 It is still important that the configfile is excluded from a gitignore file so that no data is pushed.
 
+## Resources
+
+[Github: go-yaml/yaml](https://github.com/go-yaml/yaml)
