@@ -6,5 +6,11 @@ import (
 )
 
 func main() {
-	fmt.Println(config.GetDatabasePassword())
+	client, err := config.NewClient("config.yaml")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(client.GetDatabaseUsername())
+	fmt.Println(client.GetDatabasePassword())
 }

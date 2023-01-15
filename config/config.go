@@ -1,45 +1,38 @@
 package config
 
 import (
-	"fmt"
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
-var configData *Config
-var singleton bool
-
-func config() (*Config, int) {
-
-	if singleton {
-		return nil, 409 // already loaded
-	}
-
-	yamlFile, err := ioutil.ReadFile("config.yaml")
-	if err != nil {
-		fmt.Println("[CONFIG] : Error reading config file: " + err.Error())
-	}
-	fmt.Println("[CONFIG] : Successfully reading config file")
-
-	err = yaml.Unmarshal(yamlFile, &configData)
-	if err != nil {
-		fmt.Println("[CONFIG] : Error to unmarshal config: " + err.Error())
-	}
-	fmt.Println("[CONFIG] : Successfully to unmarshal config")
-
-	singleton = true
-	return configData, 200
+type Client struct {
+	ConfigData *Config
 }
 
-func GetDatabasePassword() string {
-	config()
-	fmt.Println("[CONFIG] : Successfully getting database password")
-	return string(configData.Database.Password)
+func NewClient(file string) (*Client, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	var ConfigData Config
+	decoder := yaml.NewDecoder(f)
+	err = decoder.Decode(&ConfigData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{
+		ConfigData: &ConfigData,
+	}, nil
 }
 
-func GetDatabaseUsername() string {
-	config()
-	fmt.Println("[CONFIG] : Successfully getting database username")
-	return string(configData.Database.Username)
+func (c *Client) GetDatabasePassword() string {
+	return c.ConfigData.Database.Password
+}
+
+func (c *Client) GetDatabaseUsername() string {
+	return c.ConfigData.Database.Username
 }
